@@ -64,7 +64,7 @@ def printResults(fit, errors, end):
     peakday = dt.strptime("2020-01-01", '%Y-%m-%d') + \
         datetime.timedelta(days=fit[1])
     print(
-        f"Infection speed = {fit[0]} ±{errors[0]}\nPeak infections day = {peakday} ±{errors[1]}\nTotal infected = {fit[2]} ±{errors[2]}")
+        f"Infection speed = {fit[0]} +/-{errors[0]}\nPeak infections day = {peakday} +/-{errors[1]}\nTotal infected = {fit[2]} +/-{errors[2]}")
     print(f"End of infection ~= {end}")
 
 
