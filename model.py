@@ -47,7 +47,7 @@ def exponential_model(x, a, b, c):
 def fitModel(df, model, p0):
     x = list(df.iloc[:, 0])
     y = list(df.iloc[:, 1])
-    fit = curve_fit(model, x, y, p0=p0)
+    fit = curve_fit(model, x, y, p0=p0, maxfev=1000)
     return fit
 
 
