@@ -2,27 +2,28 @@
 import pandas as pd
 import numpy as np
 import datetime
-from datetime import datetime as dt, timedelta
+from datetime import datetime as dt, timedelta, date
 from sklearn.metrics import mean_squared_error
 from scipy.optimize import curve_fit
 from scipy.optimize import fsolve
 import matplotlib.pyplot as plt
+from os import path
 
 
 def main():
-    df = getData()
+    df = getData(
+        "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-andamento-nazionale/dpc-covid19-ita-andamento-nazionale.csv")
     df = prepareData(df)
     fit = fitModel(df, logistic_model, [2, 100, 20000])
     exp_fit = fitModel(df, exponential_model, [1, 1, 1])
     errors = fitErrors(fit)
     sol, end = infectionEnd(fit[0][0], fit[0][1], fit[0][2])
-    printResults(fit[0], errors, end)
+    saveResults(fit[0], errors, end, "results/results.csv")
     plot(list(df.iloc[:, 0]), list(df.iloc[:, 1]),
-         fit[0][2], fit, exp_fit, sol)
+         fit[0][2], fit, exp_fit, sol, f"results/{date.today()}.png")
 
 
-def getData():
-    url = "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-andamento-nazionale/dpc-covid19-ita-andamento-nazionale.csv"
+def getData(url):
     df = pd.read_csv(url)
     return df
 
@@ -60,15 +61,29 @@ def fitErrors(fit):
     return [np.sqrt(fit[1][i][i]) for i in [0, 1, 2]]
 
 
-def printResults(fit, errors, end):
-    peakday = dt.strptime("2020-01-01", '%Y-%m-%d') + \
-        datetime.timedelta(days=fit[1])
-    print(
-        f"Infection speed = {fit[0]} +/-{errors[0]}\nPeak infections day = {peakday} +/-{errors[1]}\nTotal infected = {fit[2]} +/-{errors[2]}")
-    print(f"End of infection ~= {end}")
+def saveResults(fit, errors, end, filename):
+    peakday = (dt.strptime("2020-01-01", '%Y-%m-%d') +
+               datetime.timedelta(days=fit[1])).strftime("%Y-%m-%d")
+    infection_speed = fit[0]
+    infection_speed_error = errors[0]
+    peak_day_error = errors[1]
+    total_infected = int(round(fit[2], 0))
+    total_infected_error = int(round(errors[2]))
+    end_date = end.strftime("%Y-%m-%d")
+    data = [[date.today(), infection_speed, infection_speed_error,
+             peakday, peak_day_error, total_infected, total_infected_error, end_date]]
+
+    if path.exists(filename):
+        df = pd.read_csv(filename)
+        df.loc[0 if pd.isnull(df.index.max())
+               else df.index.max() + 1] = data[0]
+    else:
+        df = pd.DataFrame(data, columns=["date", "infection_speed", "infection_speed_error",
+                                         "infection_peak_day", "infection_peak_day_error", "total_infected", "total_infected_error", "end_date"])
+    df.to_csv(filename, index=False)
 
 
-def plot(x, y, c, fit, exp_fit, sol):
+def plot(x, y, c, fit, exp_fit, sol, filename):
     pred_x = list(range(max(x), sol))
     plt.rcParams['figure.figsize'] = [7, 7]
     plt.rc('font', size=14)
@@ -84,7 +99,7 @@ def plot(x, y, c, fit, exp_fit, sol):
     plt.xlabel("Days since 1 January 2020")
     plt.ylabel("Total number of infected people")
     plt.ylim((min(y)*0.9, c*1.1))
-    plt.show()
+    plt.savefig(filename)
 
 
 if __name__ == "__main__":
