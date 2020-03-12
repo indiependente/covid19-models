@@ -1,8 +1,4 @@
-all: venv run notebook
-
-.PHONY: venv
-venv:
-	source bin/activate
+all: run notebook
 
 .PHONY: run
 run:
