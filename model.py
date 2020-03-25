@@ -30,10 +30,10 @@ def getData(url):
 
 def prepareData(df):
     df = df.loc[:, ['data', 'totale_casi']]
-    FMT = '%Y-%m-%d %H:%M:%S'
+    FMT = '%Y-%m-%dT%H:%M:%S'
     date = df['data']
     df['data'] = date.map(lambda x: (dt.strptime(
-        x, FMT) - dt.strptime("2020-01-01 00:00:00", FMT)).days)
+        x, FMT) - dt.strptime("2020-01-01T00:00:00", FMT)).days)
     return df
 
 
