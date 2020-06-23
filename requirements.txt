@@ -38,7 +38,6 @@ pexpect==4.8.0
 pickleshare==0.7.5
 prometheus-client==0.7.1
 prompt-toolkit==3.0.4
-protobuf==3.11.4
 ptyprocess==0.6.0
 pycodestyle==2.5.0
 Pygments==2.6.1
@@ -52,7 +51,6 @@ ruamel.yaml==0.15.97
 scikit-learn==0.22.2.post1
 scipy==1.4.1
 Send2Trash==1.5.0
-six==1.14.0
 sklearn==0.0
 smmap2==2.0.5
 terminado==0.8.3
